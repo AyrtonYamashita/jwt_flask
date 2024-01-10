@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <script src="../static/script.js"></script>
+</head>
+<body>
+    <form id="login_page" onsubmit="event.preventDefault(); login();">
+        <input id="username" type="text" placeholder="username">
+        <input id="password" type="password" placeholder="password">
+        <input type="submit" value="Login" id="login_btn">
+        <input type="button" value="Cadastro" id="create_btn" onclick="event.preventDefault(); create();">
+    </form>
+</body>
+</html>
