@@ -1,12 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 import jwt
-from datetime import datetime, timedelta
 import uuid
-
 from token_creator import TokenCreator
 from db_connect import Database
 
 app = Flask(__name__)
+db = Database('alt', 'postgres', 'admin', 'localhost')
+
 
 @app.route('/')
 def teste():
@@ -24,7 +24,6 @@ def authentication():
     token = TokenCreator(user, password, id)
     user_token = token.create()
     
-    db = Database('alt', 'postgres', 'admin', 'localhost')
     db.add_user(user_token)
 
 
@@ -33,41 +32,21 @@ def authentication():
     }),200
 
 
-
-# Definir credencial para acesso
-@app.route("/auth", methods=["GET"])
+@app.route("/login", methods=["GET"])
 def authorization():
     
-    raw_token = request.headers.get("Authorization")
     user = request.headers.get("username")
     password = request.headers.get("password")
-    
-    if not raw_token:
-            return jsonify({
-                'Error': "Acesso negado!"
-            }), 400
-    try:
-        token = raw_token.split()[1]
-        token_information = jwt.decode(token, key='1234', algorithms='HS256')
-        user_token = token_information["user"]
-        pwd_token = token_information["pwd"]
-    except jwt.InvalidSignatureError:
+
+    validate = db.validate_user(user, password)
+    if validate["Code"] == 'E1':
         return jsonify({
-            'Error': "Token inválido!"
+            'Erro': 'Usuário inválido!'
         }), 401
-    except jwt.ExpiredSignatureError:
+    if validate["Code"] == 'E2':
         return jsonify({
-            'Error': "Token expirado!"
+            'Erro': 'Senha inválida' 
         }), 401
-    
-    if user != user_token:
-        return jsonify({
-                "Error": "Usuário inválido!"
-            }), 401
-    if password != pwd_token:
-        return jsonify({
-            "Error": "Senha inválida!"
-        })
 
     return jsonify({
         'message': "Hello World!"

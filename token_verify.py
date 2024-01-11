@@ -35,11 +35,11 @@ class TokenVerify:
                 "Error": "Senha inválida!"
             })
 
-class InsertDB:
-    def __init__(self, token_user):
+class ManageDB:
+    def __init__(self):
+        pass
+    def token_validate(self, token_user):
         self.token = token_user
-
-    def token_validate(self):
         try:
             token_info = jwt.decode(self.token, key='1234', algorithms='HS256')
         except jwt.ExpiredSignatureError:
@@ -52,4 +52,19 @@ class InsertDB:
             }), 401
 
         return token_info
+    
+    def pass_decode(self, pwd):
+        self.pass_token = pwd
+        try:
+            token_info = jwt.decode(self.pass_token, key='pwd_script', algorithms='HS256')
+        except jwt.InvalidSignatureError:
+            return jsonify({
+                'Error': 'Token inválido!'
+            }), 401
+        except KeyError as e:
+            return jsonify({
+                'Error': 'Token inválido!'
+            }), 401
+        return token_info
+            
 

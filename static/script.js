@@ -3,15 +3,16 @@ function login(){
     username = document.getElementById("username");
     password = document.getElementById("password");
 
-    console.log(password.value)
     fetch('/login', {
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'username': username.value,
             'password': password.value 
         }
-    })
+    }).then(response => response.json())
+    .then(data =>
+        console.log('DEU CERTO!'))
 }
 
 function create(){
