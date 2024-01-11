@@ -3,7 +3,7 @@ function login(){
     username = document.getElementById("username");
     password = document.getElementById("password");
 
-    fetch('/login', {
+    fetch('/validate', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -11,8 +11,20 @@ function login(){
             'password': password.value 
         }
     }).then(response => response.json())
-    .then(data =>
-        console.log('DEU CERTO!'))
+    .then(data =>{
+        if(data["Status"]){
+            exist_form = document.querySelector('form');
+            // if(exist_form){
+            //     document.body.removeChild(exist_form)
+            // }
+            home_page(data["Token"])
+
+        }else{
+            alert("Usuário ou senha inválidos!")
+            alert("Caso não tenha acesso, por gentileza realize o cadastro!")
+        }
+    }
+    )
 }
 
 function create(){
@@ -62,4 +74,17 @@ function create(){
     document.body.appendChild(form);
 
 
+}
+
+function home_page(token){
+    fetch('/home', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'token': token
+        }
+    }).then(response => response.json())
+    .then(data =>{
+        console.log(data)
+    })
 }

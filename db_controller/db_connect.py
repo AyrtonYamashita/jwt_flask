@@ -1,6 +1,5 @@
 import psycopg2
-from token_verify import ManageDB
-from flask import jsonify
+from token_controller.token_decode import ManageDB
 
 token = ManageDB()
 

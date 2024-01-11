@@ -2,38 +2,31 @@ import jwt
 from flask import jsonify
 
 class TokenVerify:
-    def __init__(self, token, user, password):
+    def __init__(self):
+        pass
+    def decode_token(self, token):
         self.token = token
-        self.user = user
-        self.password = password
-    def validate(self):
 
         if not self.token:
             return jsonify({
-                'Error': "Acesso negado!"
+                'Error': "Token inválido"
             }), 400
+        
         try:
-            token = self.token.split()[1]
-            token_information = jwt.decode(token, key='1234', algorithms='HS256')
-            user_token = token_information["user"]
-            pwd_token = token_information["pwd"]
+            token_information = jwt.decode(token, key='exp_token', algorithms='HS256')
         except jwt.InvalidSignatureError:
             return jsonify({
                 'Error': "Token inválido!"
-            }), 401
+            })
         except jwt.ExpiredSignatureError:
             return jsonify({
                 'Error': "Token expirado!"
             }), 401
+    
+        return token_information
         
-        if self.user != user_token:
-            return jsonify({
-                    "Error": "Usuário inválido!"
-                }), 401
-        if self.password != pwd_token:
-            return jsonify({
-                "Error": "Senha inválida!"
-            })
+
+
 
 class ManageDB:
     def __init__(self):
