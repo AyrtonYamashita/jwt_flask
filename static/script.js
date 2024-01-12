@@ -13,12 +13,7 @@ function login(){
     }).then(response => response.json())
     .then(data =>{
         if(data["Status"]){
-            exist_form = document.querySelector('form');
-            // if(exist_form){
-            //     document.body.removeChild(exist_form)
-            // }
             home_page(data["Token"])
-
         }else{
             alert("Usuário ou senha inválidos!")
             alert("Caso não tenha acesso, por gentileza realize o cadastro!")
@@ -62,6 +57,7 @@ function create(){
                 'password': confirm_pass.value
             }
         })
+        
     }
 
     };
@@ -81,10 +77,17 @@ function home_page(token){
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'token': token
+            'Authorization': token
         }
     }).then(response => response.json())
     .then(data =>{
         console.log(data)
+        if(data["Status"]){
+            exist_form = document.querySelector('form'); 
+            if(exist_form){
+                document.body.removeChild(exist_form);
+            }
+            document.body.appendChild(h1);
+        }
     })
 }

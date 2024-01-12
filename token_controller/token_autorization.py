@@ -10,7 +10,7 @@ class Auth:
 
         token = jwt.encode({
             'uid': self.uid,
-            'exp': datetime.utcnow() + timedelta(seconds=1)
+            'exp': datetime.utcnow() + timedelta(minutes=1)
         }, key='exp_token', algorithm='HS256')
 
         return token

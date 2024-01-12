@@ -1,5 +1,6 @@
 import psycopg2
 from token_controller.token_decode import ManageDB
+from flask import jsonify
 
 token = ManageDB()
 
@@ -34,11 +35,14 @@ class Database:
             )
         '''
         )
-        cur.execute('''INSERT INTO email_alt.usuarios (id, username, senha) VALUES (%s, %s, %s)''', (id, user, password))
-        con.commit()
-        cur.close()
+        try:
+            cur.execute('''INSERT INTO email_alt.usuarios (id, username, senha) VALUES (%s, %s, %s)''', (id, user, password))
+            con.commit()
+            cur.close()
+            return con
+        except psycopg2.errors.UniqueViolation:
+            return False
 
-        return con
         
     def validate_user(self, user, pwd):
         self.user = user

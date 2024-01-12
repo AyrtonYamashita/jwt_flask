@@ -9,7 +9,7 @@ class TokenVerify:
 
         if not self.token:
             return jsonify({
-                'Error': "Token inválido"
+                'Error': "Token ausente"
             }), 400
         
         try:

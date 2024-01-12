@@ -5,6 +5,8 @@ from token_controller.token_autorization import Auth
 from token_controller.token_decode import TokenVerify
 from db_controller.db_connect import Database
 
+import jwt
+
 app = Flask(__name__)
 db = Database('alt', 'postgres', 'admin', 'localhost')
 
@@ -20,12 +22,9 @@ def create_user():
     user = request.headers.get("username")
     password = request.headers.get("password")
     id = uuid.uuid4()
-
     token = TokenCreator(user, password, id)
     user_token = token.create()
-
     db.add_user(user_token)
-
 
 @app.route("/validate", methods=["GET"])
 def validate_user():
@@ -52,14 +51,30 @@ def validate_user():
 
 @app.route("/home", methods=["GET"])
 def home():
-    verify_token = TokenVerify()
-    token_access = request.headers.get("token")
-    token = verify_token.decode_token(token_access)
 
+    token = request.headers.get("Authorization")
+
+    if not token:
+        return jsonify({
+            'Message': 'Token ausente!'
+        }), 401
     
-    return jsonify({
-        'token': token
-    })
+    try:
+        payload = jwt.decode(token, key='exp_token', algorithms='HS256')
+        return jsonify({
+            'Status': True,
+            'User': payload["uid"]
+        }), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({
+            'Error': 'Token expirado!' 
+        }), 401
+    except jwt.InvalidSignatureError:
+        return jsonify({
+            'Error': 'Token inválido!'
+        }), 401
+
+
 
 if __name__ == ("__main__"):
     app.run(debug=True)
