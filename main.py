@@ -22,9 +22,13 @@ def create_user():
     user = request.headers.get("username")
     password = request.headers.get("password")
     id = uuid.uuid4()
-    token = TokenCreator(user, password, id)
+    permission = 0
+    token = TokenCreator(user, password, id, permission)
     user_token = token.create()
     db.add_user(user_token)
+    return jsonify({
+        'user_token': user_token
+    }),200
 
 @app.route("/validate", methods=["GET"])
 def validate_user():
@@ -47,6 +51,36 @@ def validate_user():
         'uid': validate["Token"],
         'Token': token_auth
     })
+
+@app.route('/admin', methods=["GET"])
+def admin_painel():
+    token = request.headers.get("Authorization")
+    if not token:
+        return jsonify({
+            'Message': 'Token ausente!'
+        }), 401
+    try:
+        payload = jwt.decode(token, key='exp_token', algorithms='HS256')
+        uid = payload["uid"]
+        validate = db.validate_permission(uid)
+        if validate["Code"] == 'E3':
+           return jsonify({
+               'Status': False
+           }), 401
+
+        return jsonify({
+        'Status': True,
+        'Permission': validate["Permission"]
+    }),200
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({
+            'Error': 'Token expirado!' 
+        }), 401
+    except jwt.InvalidSignatureError:
+        return jsonify({
+            'Error': 'Token inválido!'
+        }), 401
 
 
 @app.route("/home", methods=["GET"])
